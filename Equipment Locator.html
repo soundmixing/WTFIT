@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Equipment Locator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;700&display=swap">
+<style>
+:root{--bg:#070b1a;--ink:#e8f1ff;--mute:#7f93b8;--neon:#00e5ff;--neon2:#ff2bd6;
+color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg)}
+body{margin:0;min-height:100vh;color:var(--ink);font:15px/1.4 "Rajdhani","Segoe UI",system-ui,sans-serif;
+background:radial-gradient(900px 500px at 10% -10%,rgba(0,229,255,.18),transparent 60%),radial-gradient(800px 500px at 100% 0,rgba(255,43,214,.16),transparent 60%),radial-gradient(900px 600px at 50% 120%,rgba(120,80,255,.2),transparent 60%),var(--bg);
+background-attachment:fixed}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+background-image:linear-gradient(rgba(0,229,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.06) 1px,transparent 1px);background-size:44px 44px;
+-webkit-mask-image:radial-gradient(ellipse at 50% 30%,#000 20%,transparent 80%);mask-image:radial-gradient(ellipse at 50% 30%,#000 20%,transparent 80%)}
+main{position:relative;z-index:1;max-width:1150px;margin:0 auto;padding:18px}
+header{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:16px}
+h1{font:800 26px/1 "Orbitron","Segoe UI",sans-serif;letter-spacing:.14em;text-transform:uppercase;margin:0;
+background:linear-gradient(90deg,var(--neon),#8a7bff 55%,var(--neon2));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 10px rgba(0,229,255,.55))}
+.status{font-size:12px;color:var(--mute);letter-spacing:.06em;display:flex;align-items:center;gap:7px}
+.status::before{content:"";width:8px;height:8px;border-radius:50%;background:#2dff8f;box-shadow:0 0 10px #2dff8f;animation:pulse 2s infinite}
+@keyframes pulse{50%{opacity:.35}}
+.bar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
+input,select,button{font:inherit;font-weight:600;color:var(--ink);background:rgba(14,22,48,.75);border:1px solid rgba(0,229,255,.35);border-radius:10px;padding:9px 12px;outline:none;backdrop-filter:blur(8px);transition:box-shadow .15s,border-color .15s}
+input:focus,select:focus{border-color:var(--neon);box-shadow:0 0 0 1px var(--neon),0 0 16px rgba(0,229,255,.45)}
+input{flex:1;min-width:150px}
+select option{background:#0e1630}
+button{cursor:pointer}
+button:hover{box-shadow:0 0 14px rgba(0,229,255,.5)}
+button.primary{background:linear-gradient(135deg,#00b8ff,#7a5cff 60%,#ff2bd6);border:0;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.4);box-shadow:0 4px 18px rgba(122,92,255,.55)}
+button.danger{color:#ff6b8a;border-color:rgba(255,107,138,.6)}
+.find{font-size:14px;color:#ffe45e;text-shadow:0 0 10px rgba(255,228,94,.5);margin:-4px 0 12px;min-height:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(235px,1fr));gap:18px;perspective:1300px}
+.box{--c:#00e5ff;position:relative;border-radius:16px;padding:12px;min-height:170px;
+background:linear-gradient(160deg,color-mix(in srgb,var(--c) 16%,#0b1230) 0%,rgba(9,14,36,.88) 55%);
+border:1px solid color-mix(in srgb,var(--c) 70%,transparent);
+box-shadow:0 0 0 1px color-mix(in srgb,var(--c) 25%,transparent),0 0 24px color-mix(in srgb,var(--c) 38%,transparent),0 18px 30px -12px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.12),inset 0 0 40px color-mix(in srgb,var(--c) 10%,transparent);
+transform:rotateX(4deg);transform-origin:50% 100%;transition:transform .2s,box-shadow .2s}
+.box:hover{transform:rotateX(0) translateY(-4px)}
+.box::after{content:"";position:absolute;left:12px;right:12px;top:0;height:2px;border-radius:2px;background:var(--c);box-shadow:0 0 12px var(--c),0 0 24px var(--c)}
+.box.over{transform:rotateX(0) translateY(-6px) scale(1.03);box-shadow:0 0 0 2px var(--c),0 0 44px var(--c),0 24px 40px -12px rgba(0,0,0,.8),inset 0 0 60px color-mix(in srgb,var(--c) 30%,transparent)}
+.box.tray{grid-column:1/-1;min-height:84px;border-style:dashed;transform:none}
+.box.tray:hover{transform:none}
+.box h2{font:700 15px "Orbitron","Segoe UI",sans-serif;letter-spacing:.12em;margin:2px 0 11px;display:flex;justify-content:space-between;align-items:baseline;color:var(--c);text-shadow:0 0 12px var(--c)}
+.box h2 span{font:600 12px "Rajdhani",sans-serif;letter-spacing:.05em;color:var(--mute);text-shadow:none}
+.items{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:6px 12px 6px 9px;border-radius:11px;font-weight:700;font-size:14px;cursor:grab;user-select:none;touch-action:none;color:#f2f7ff;
+background:linear-gradient(180deg,rgba(255,255,255,.2),rgba(255,255,255,.04) 55%),color-mix(in srgb,var(--c) 22%,#0d1430);
+border:1px solid color-mix(in srgb,var(--c) 75%,#fff 0%);
+box-shadow:0 3px 0 color-mix(in srgb,var(--c) 45%,#000),0 7px 14px rgba(0,0,0,.55),0 0 12px color-mix(in srgb,var(--c) 35%,transparent),inset 0 1px 0 rgba(255,255,255,.35);
+transition:transform .12s,box-shadow .12s}
+.chip:hover{transform:translateY(-2px);box-shadow:0 5px 0 color-mix(in srgb,var(--c) 45%,#000),0 11px 18px rgba(0,0,0,.6),0 0 20px var(--c),inset 0 1px 0 rgba(255,255,255,.4)}
+.chip svg{width:19px;height:19px;flex:none;fill:none;stroke:var(--c);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px var(--c))}
+.chip.hit{animation:hit 1s ease-in-out infinite;border-color:#ffe45e;color:#fff6c2}
+.chip.hit svg{stroke:#ffe45e;filter:drop-shadow(0 0 5px #ffe45e)}
+@keyframes hit{50%{box-shadow:0 3px 0 #8a6d00,0 0 30px #ffe45e,0 0 8px #ffe45e}}
+.chip.dim{opacity:.3;filter:saturate(.4)}
+.chip.lift{opacity:.25}
+.ghost{position:fixed;z-index:50;pointer-events:none;transform:translate(-50%,-50%) scale(1.12) rotate(-4deg);box-shadow:0 14px 30px rgba(0,0,0,.7),0 0 30px var(--c)}
+.empty{color:var(--mute);font-size:13px;font-style:italic}
+.modal{position:fixed;inset:0;background:rgba(2,4,14,.7);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:60;padding:16px}
+.modal.on{display:flex}
+.panel{background:linear-gradient(160deg,#121b42,#0a1030);border:1px solid var(--neon);border-radius:16px;padding:18px;width:100%;max-width:350px;display:flex;flex-direction:column;gap:12px;box-shadow:0 0 40px rgba(0,229,255,.35),0 20px 50px rgba(0,0,0,.7)}
+.panel strong{font:700 14px "Orbitron",sans-serif;letter-spacing:.12em;color:var(--neon);text-shadow:0 0 10px var(--neon)}
+.panel .row{display:flex;gap:8px;justify-content:space-between}
+.toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#0e1630;border:1px solid var(--neon2);color:#fff;box-shadow:0 0 20px rgba(255,43,214,.5);padding:9px 15px;border-radius:10px;font-size:13px;display:none;z-index:70}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Equipment Locator</h1>
+    <div class="status" id="status">Connecting…</div>
+  </header>
+  <div class="bar">
+    <input id="search" type="search" placeholder="Find an item (e.g. Bose3)">
+  </div>
+  <div class="find" id="find"></div>
+  <div class="bar">
+    <input id="newName" placeholder="New item name">
+    <select id="newLoc"></select>
+    <button class="primary" id="addBtn">Add item</button>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<div class="modal" id="modal">
+  <div class="panel">
+    <strong>Edit item</strong>
+    <input id="editName">
+    <select id="editLoc"></select>
+    <div class="row">
+      <button class="danger" id="delBtn">Delete</button>
+      <span style="display:flex;gap:8px"><button id="cancelBtn">Cancel</button><button class="primary" id="saveBtn">Save</button></span>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+var LOCS=["1220","4250","2375/2","2375/3","OneU/7"];
+var UN="unassigned";
+var COL={"unassigned":"#7f93b8","1220":"#00e5ff","4250":"#ff2bd6","2375/2":"#39ff7a","2375/3":"#ffb020","OneU/7":"#a678ff"};
+var IC={
+mixer:'<path d="M5 4v16M12 4v16M19 4v16"/><rect x="3" y="13" width="4" height="3" rx="1"/><rect x="10" y="7" width="4" height="3" rx="1"/><rect x="17" y="11" width="4" height="3" rx="1"/>',
+cam:'<rect x="2.5" y="7" width="13" height="10" rx="2.2"/><path d="M15.5 11l6-3.2v8.4l-6-3.2"/>',
+spk:'<rect x="6" y="2.8" width="12" height="18.4" rx="2.4"/><circle cx="12" cy="14.3" r="3.6"/><circle cx="12" cy="7.2" r="1.1"/>',
+pack:'<rect x="5" y="10" width="14" height="10.5" rx="2.2"/><path d="M12 10V4.5M8.8 7a4.6 4.6 0 0 1 6.4 0M7 4.8a7.4 7.4 0 0 1 10 0"/>',
+sw:'<path d="M3.5 8h14l-3.2-3.2M20.5 16h-14l3.2 3.2"/>',
+wave:'<path d="M2 12h3l2-6 3 12 3-9 2 5 2-2h5"/>',
+cube:'<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9zM12 12l8-4.5M12 12v9M12 12L4 7.5"/>'};
+function iconFor(n){n=n.toLowerCase();var k=/^(ql|dm)/.test(n)?"mixer":/codec|cam/.test(n)?"cam":/bose|spk|speaker/.test(n)?"spk":/hop|pack/.test(n)?"pack":/switch/.test(n)?"sw":/dfb|float/.test(n)?"wave":"cube";
+return '<svg viewBox="0 0 24 24" aria-hidden="true">'+IC[k]+'</svg>'}
+var items={}, db=null, dragging=false, pendingRender=false, editId=null, loaded=false;
+var $=function(id){return document.getElementById(id)};
+
+function toast(msg){var t=$("toast");t.textContent=msg;t.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(function(){t.style.display="none"},3500)}
+function locLabel(l){return l===UN?"Unassigned":l}
+
+function fillSelect(sel,withUn){
+  sel.textContent="";
+  var all=[UN].concat(LOCS);
+  all.forEach(function(l){var o=document.createElement("option");o.value=l;o.textContent=locLabel(l);sel.appendChild(o)});
+}
+fillSelect($("newLoc"));fillSelect($("editLoc"));
+
+function natural(a,b){return a.name.localeCompare(b.name,undefined,{numeric:true,sensitivity:"base"})}
+
+function render(){
+  if(dragging){pendingRender=true;return}
+  var q=$("search").value.trim().toLowerCase();
+  var grid=$("grid");grid.textContent="";
+  var list=Object.keys(items).map(function(id){return Object.assign({id:id},items[id])});
+  var hits=q?list.filter(function(i){return i.name.toLowerCase().indexOf(q)>-1}):[];
+  var places=[UN].concat(LOCS);
+  places.forEach(function(loc){
+    var box=document.createElement("div");
+    box.className="box"+(loc===UN?" tray":"");box.dataset.loc=loc;box.style.setProperty("--c",COL[loc]||"#00e5ff");
+    var mine=list.filter(function(i){return (i.loc||UN)===loc||(loc===UN&&LOCS.indexOf(i.loc)<0)}).sort(natural);
+    var h=document.createElement("h2");
+    var n=document.createElement("b");n.textContent=locLabel(loc);
+    var c=document.createElement("span");c.textContent=mine.length+(mine.length===1?" item":" items");
+    h.appendChild(n);h.appendChild(c);box.appendChild(h);
+    var wrap=document.createElement("div");wrap.className="items";
+    if(!mine.length){var e=document.createElement("div");e.className="empty";e.textContent=loc===UN?"Drag items here if their location is unknown":"Empty";wrap.appendChild(e)}
+    mine.forEach(function(it){
+      var ch=document.createElement("div");
+      var isHit=q&&it.name.toLowerCase().indexOf(q)>-1;
+      ch.className="chip"+(isHit?" hit":(q?" dim":""));
+      ch.innerHTML=iconFor(it.name);var lb=document.createElement("span");lb.textContent=it.name;ch.appendChild(lb);ch.dataset.id=it.id;
+      attachDrag(ch);
+      wrap.appendChild(ch);
+    });
+    box.appendChild(wrap);grid.appendChild(box);
+  });
+  var f=$("find");
+  if(!q)f.textContent="";
+  else if(!hits.length)f.textContent="No items match “"+$("search").value.trim()+"”.";
+  else f.textContent=hits.map(function(i){return i.name+" → "+locLabel(i.loc||UN)}).join("   ·   ");
+}
+
+function attachDrag(el){
+  el.addEventListener("pointerdown",function(ev){
+    if(ev.button>0)return;
+    var sx=ev.clientX,sy=ev.clientY,moved=false,ghost=null,overBox=null,id=el.dataset.id;
+    try{el.setPointerCapture(ev.pointerId)}catch(e){}
+    function move(e){
+      if(!moved&&Math.hypot(e.clientX-sx,e.clientY-sy)>6){
+        moved=true;dragging=true;
+        ghost=el.cloneNode(true);ghost.classList.add("ghost");ghost.style.setProperty("--c",(el.closest("[data-loc]")||document.body).style.getPropertyValue("--c")||"#00e5ff");document.body.appendChild(ghost);
+        el.classList.add("lift");
+      }
+      if(moved){
+        ghost.style.left=e.clientX+"px";ghost.style.top=e.clientY+"px";
+        var t=document.elementFromPoint(e.clientX,e.clientY);
+        var b=t&&t.closest?t.closest("[data-loc]"):null;
+        if(b!==overBox){if(overBox)overBox.classList.remove("over");overBox=b;if(b)b.classList.add("over")}
+      }
+    }
+    function up(e){
+      el.removeEventListener("pointermove",move);el.removeEventListener("pointerup",up);el.removeEventListener("pointercancel",up);
+      if(moved){
+        if(ghost)ghost.remove();
+        if(overBox)overBox.classList.remove("over");
+        dragging=false;
+        var target=overBox&&e.type!=="pointercancel"?overBox.dataset.loc:null;
+        var cur=items[id]&&items[id].loc;
+        if(target&&target!==cur)writeDoc(id,{loc:target,ts:Date.now()});
+        if(pendingRender||!target||target===cur){pendingRender=false;render()}
+      }else if(e.type==="pointerup"){openEdit(id)}
+    }
+    el.addEventListener("pointermove",move);el.addEventListener("pointerup",up);el.addEventListener("pointercancel",up);
+  });
+}
+
+function writeDoc(id,data){
+  if(!db){toast("Not connected yet");return Promise.resolve()}
+  // optimistic local update for snappy UI
+  items[id]=Object.assign({},items[id],data);
+  return db.doc("items/"+id).update(data).catch(function(err){
+    toast(err&&err.code==="permission_denied"?"You have view-only access":"Couldn’t save change");
+  });
+}
+
+function openEdit(id){
+  if(!items[id])return;
+  editId=id;$("editName").value=items[id].name;$("editLoc").value=items[id].loc||UN;
+  $("delBtn").textContent="Delete";$("delBtn").dataset.arm="";
+  $("modal").classList.add("on");
+}
+function closeEdit(){$("modal").classList.remove("on");editId=null}
+$("cancelBtn").onclick=closeEdit;
+$("modal").addEventListener("click",function(e){if(e.target===$("modal"))closeEdit()});
+$("saveBtn").onclick=function(){
+  var nm=$("editName").value.trim();if(!nm||!editId)return;
+  writeDoc(editId,{name:nm,loc:$("editLoc").value,ts:Date.now()});closeEdit();render();
+};
+$("delBtn").onclick=function(){
+  var b=$("delBtn");
+  if(!b.dataset.arm){b.dataset.arm="1";b.textContent="Tap again to confirm";return}
+  var id=editId;closeEdit();
+  delete items[id];render();
+  db&&db.doc("items/"+id).delete().catch(function(){toast("Couldn’t delete")});
+};
+
+function slug(s){return s.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"item"}
+$("addBtn").onclick=function(){
+  var nm=$("newName").value.trim();if(!nm)return;
+  if(!db){toast("Not connected yet");return}
+  var dup=Object.keys(items).some(function(k){return items[k].name.toLowerCase()===nm.toLowerCase()});
+  if(dup){toast("An item with that name already exists");return}
+  var id=slug(nm);if(items[id])id+="-"+Date.now().toString(36);
+  var data={name:nm,loc:$("newLoc").value,ts:Date.now()};
+  items[id]=data;render();$("newName").value="";
+  db.doc("items/"+id).set(data).catch(function(){toast("Couldn’t add item")});
+};
+$("newName").addEventListener("keydown",function(e){if(e.key==="Enter")$("addBtn").click()});
+$("search").addEventListener("input",render);
+
+function setStatus(){
+  var n=Object.keys(items).length;
+  $("status").textContent="Live · "+n+" item"+(n===1?"":"s")+" · changes sync to everyone";
+}
+
+render();
+var timer=setTimeout(function(){if(!loaded)$("status").textContent="Can’t reach shared data yet…"},10000);
+claude.use("db").then(function(d){
+  if(!d){clearTimeout(timer);$("status").textContent="Sign in to claude.ai to view and edit the shared inventory.";return}
+  db=d;
+  db.collection("items").onSnapshot(function(snap){
+    loaded=true;clearTimeout(timer);
+    var next={};
+    snap.docs.forEach(function(doc){next[doc.id]=doc.data()||{}});
+    items=next;setStatus();render();
+  },function(){clearTimeout(timer);$("status").textContent="Lost connection to shared data."});
+}).catch(function(){$("status").textContent="Shared data unavailable."});
+})();
+</script>
+</body>
+</html>
